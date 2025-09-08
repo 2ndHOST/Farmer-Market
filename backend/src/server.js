@@ -4,6 +4,7 @@ import cors from 'cors'
 import morgan from 'morgan'
 import listingsRouter from './routes/listings.js'
 import bidsRouter from './routes/bids.js'
+import authRouter from './routes/auth.js'
 
 const app = express()
 const PORT = process.env.PORT || 3000
@@ -14,6 +15,7 @@ app.use(express.json())
 app.use(morgan('dev'))
 
 app.get('/health', (_req, res) => res.json({ ok: true }))
+app.use('/auth', authRouter)
 app.use('/listings', listingsRouter)
 app.use('/bids', bidsRouter)
 

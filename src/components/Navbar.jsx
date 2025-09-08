@@ -1,8 +1,10 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import useAuth from '../hooks/useAuth.js'
 
 function Navbar() {
 	const [open, setOpen] = useState(false)
+	const { user } = useAuth()
 	return (
 		<header className="sticky top-0 z-50 w-full bg-white/80 backdrop-blur supports-[backdrop-filter]:bg-white/60 shadow">
 			<div className="mx-auto max-w-7xl px-4 py-3 flex items-center justify-between">
@@ -15,7 +17,11 @@ function Navbar() {
 					<Link to="/prices" className="hover:text-[--color-agri-green]">Price Board</Link>
 					<a href="#about" className="hover:text-[--color-agri-green]">About</a>
 					<a href="#contact" className="hover:text-[--color-agri-green]">Contact</a>
-					<Link to="/login" className="inline-flex items-center justify-center rounded-lg bg-green-700 text-white shadow-md px-4 py-2 sm:px-3 sm:py-1 md:px-4 md:py-2 hover:bg-green-800 transition text-sm">Login</Link>
+					{user ? (
+						<span className="inline-flex items-center justify-center rounded-lg bg-green-700 text-white shadow-md px-4 py-2 sm:px-3 sm:py-1 md:px-4 md:py-2">Profile: {user.name || user.phone}</span>
+					) : (
+						<Link to="/login" className="inline-flex items-center justify-center rounded-lg bg-green-700 text-white shadow-md px-4 py-2 sm:px-3 sm:py-1 md:px-4 md:py-2 hover:bg-green-800 transition text-sm">Login</Link>
+					)}
 				</nav>
 				<button aria-label="Toggle Menu" className="sm:hidden p-2 rounded-md hover:bg-neutral-100" onClick={() => setOpen((v) => !v)}>
 					<span className="i-heroicons-bars-3 text-2xl">≡</span>
@@ -28,7 +34,11 @@ function Navbar() {
 						<Link to="/prices" onClick={() => setOpen(false)} className="hover:text-[--color-agri-green]">Price Board</Link>
 						<a href="#about" onClick={() => setOpen(false)} className="hover:text-[--color-agri-green]">About</a>
 						<a href="#contact" onClick={() => setOpen(false)} className="hover:text-[--color-agri-green]">Contact</a>
-						<Link to="/login" onClick={() => setOpen(false)} className="inline-flex items-center justify-center rounded-lg bg-green-700 text-white shadow-md px-4 py-2 hover:bg-green-800 transition text-center">Login</Link>
+						{user ? (
+							<span className="inline-flex items-center justify-center rounded-lg bg-green-700 text-white shadow-md px-4 py-2">Profile: {user.name || user.phone}</span>
+						) : (
+							<Link to="/login" onClick={() => setOpen(false)} className="inline-flex items-center justify-center rounded-lg bg-green-700 text-white shadow-md px-4 py-2 hover:bg-green-800 transition text-center">Login</Link>
+						)}
 					</div>
 				</div>
 			)}

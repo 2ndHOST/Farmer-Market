@@ -12,6 +12,16 @@ dist
 dist-ssr
 *.local
 
+# Backend node_modules
+backend/node_modules/
+backend/prisma/dev.db
+
+# Environments
+.env
+.env.*
+backend/.env
+backend/.env.*
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
@@ -22,3 +32,22 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Build outputs
+/build/
+backend/dist/
+backend/build/
+.cache/
+.temp/
+.tmp/
+
+# Vite/Cache
+.vite/
+.eslintcache
+
+# Prisma SQLite dev DB
+backend/dev.db
+backend/dev.db-journal
+
+# Coverage
+coverage/

@@ -10,4 +10,13 @@ api.interceptors.request.use((config) => {
 	return config
 })
 
+export const AuthAPI = {
+	sendOtp(phone) {
+		return api.post('/auth/send-otp', { phone })
+	},
+	verifyOtp({ phone, code, name }) {
+		return api.post('/auth/verify-otp', { phone, code, name })
+	},
+}
+
 
