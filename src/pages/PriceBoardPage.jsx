@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import Navbar from '../components/Navbar.jsx'
 import Footer from '../components/Footer.jsx'
 import BidModal from '../components/BidModal.jsx'
@@ -9,25 +9,15 @@ function PriceBoardPage() {
 	const [loading, setLoading] = useState(true)
 	const [selected, setSelected] = useState(null)
 	const [open, setOpen] = useState(false)
+	const [query, setQuery] = useState('')
+	const [sortAsc, setSortAsc] = useState(true)
 
 	useEffect(() => {
 		let mounted = true
 		;(async () => {
-			try {
-				const res = await api.get('/listings')
-				const data = res?.data || []
-				if (mounted) setListings(Array.isArray(data) ? data : [])
-			} catch (e) {
-				// fallback demo data
-				if (mounted) setListings([
-					{ id: '1', crop: 'Tomato', unit: 'kg', quantity: 120, minPrice: 18, farmerName: 'Farmer A' },
-					{ id: '2', crop: 'Potato', unit: 'kg', quantity: 200, minPrice: 22, farmerName: 'Farmer B' },
-					{ id: '3', crop: 'Onion', unit: 'kg', quantity: 150, minPrice: 32, farmerName: 'Farmer C' },
-				])
-			}
-			finally {
-				if (mounted) setLoading(false)
-			}
+			const res = await api.get('/listings')
+			if (mounted) setListings(Array.isArray(res?.data) ? res.data : [])
+			setLoading(false)
 		})()
 		return () => { mounted = false }
 	}, [])
@@ -37,18 +27,25 @@ function PriceBoardPage() {
 		setOpen(true)
 	}
 
-	async function submitBid({ amount }) {
+	async function submitBid({ price }) {
 		if (!selected) return
-		try {
-			await api.post(`/bids/${selected.id}`, { amount: Number(amount) })
-			alert('Bid submitted successfully')
-		} catch (e) {
-			alert('Failed to submit bid')
-		} finally {
-			setOpen(false)
-			setSelected(null)
-		}
+		await api.post('/bid', { crop: selected.crop || selected.name, price })
+		setOpen(false)
+		setSelected(null)
+		// refresh after bid to reflect latest min price
+		const res = await api.get('/listings')
+		setListings(Array.isArray(res?.data) ? res.data : [])
 	}
+
+	const filtered = useMemo(() => {
+		const q = query.trim().toLowerCase()
+		const arr = q ? listings.filter(x => (x.crop || x.name || '').toLowerCase().includes(q)) : listings
+		return [...arr].sort((a, b) => {
+			const ap = a.minPrice ?? a.price ?? 0
+			const bp = b.minPrice ?? b.price ?? 0
+			return sortAsc ? ap - bp : bp - ap
+		})
+	}, [listings, query, sortAsc])
 
 	return (
 		<div className="min-h-screen flex flex-col">
@@ -56,6 +53,10 @@ function PriceBoardPage() {
 			<main className="flex-1">
 				<div className="mx-auto max-w-7xl px-4 py-12">
 					<h1 className="text-3xl font-bold text-neutral-900">Price Board</h1>
+					<div className="mt-4 flex flex-wrap items-center gap-3">
+						<input aria-label="Filter by product" value={query} onChange={(e)=>setQuery(e.target.value)} placeholder="Filter by product" className="rounded-xl border border-neutral-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[--color-agri-green]" />
+						<button onClick={()=>setSortAsc(v=>!v)} className="rounded-lg bg-green-700 text-white px-4 py-2 shadow-md hover:bg-green-800 transition">Sort by Price {sortAsc ? '▲' : '▼'}</button>
+					</div>
 					<div className="mt-6 card-base overflow-hidden">
 						<div className="overflow-x-auto">
 							<table className="min-w-full text-sm">
@@ -74,12 +75,12 @@ function PriceBoardPage() {
 										<tr>
 											<td colSpan="6" className="px-4 py-6 text-center text-neutral-500">Loading...</td>
 										</tr>
-									) : listings.length === 0 ? (
+									) : filtered.length === 0 ? (
 										<tr>
 											<td colSpan="6" className="px-4 py-6 text-center text-neutral-500">No listings available</td>
 										</tr>
 									) : (
-										listings.map((item) => (
+										filtered.map((item) => (
 											<tr key={item.id} className="hover:bg-neutral-50">
 												<td className="px-4 py-3 font-medium text-neutral-900">{item.crop || item.name}</td>
 												<td className="px-4 py-3">{item.unit || 'kg'}</td>
@@ -87,19 +88,19 @@ function PriceBoardPage() {
 												<td className="px-4 py-3 text-[--color-agri-green] font-semibold">{item.minPrice ?? item.price}</td>
 												<td className="px-4 py-3">{item.farmerName || '—'}</td>
 												<td className="px-4 py-3">
-													<button onClick={() => openBid(item)} className="btn-primary">Place Bid</button>
+													<button onClick={() => openBid(item)} className="rounded-lg bg-green-700 text-white px-3 py-2 shadow-md hover:bg-green-800 transition">Place Bid</button>
 												</td>
 											</tr>
 										))
 									)}
-								</tbody>
-							</table>
+							</tbody>
+						</table>
 						</div>
 					</div>
 				</div>
 			</main>
 			<Footer />
-			<BidModal open={open} onClose={() => setOpen(false)} onSubmit={submitBid} />
+			<BidModal open={open} onClose={() => setOpen(false)} onSubmit={submitBid} defaultCrop={selected?.crop || selected?.name} />
 		</div>
 	)
 }
