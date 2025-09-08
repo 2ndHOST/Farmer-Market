@@ -190,11 +190,33 @@ if (typeof window !== 'undefined') {
 }
 
 export const AuthAPI = {
-	sendOtp(phone) {
-		return api.post('/auth/send-otp', { phone })
+	async sendOtp(phone) {
+		const BASE_URL = (import.meta && import.meta.env && import.meta.env.VITE_API_URL) || 'http://localhost:3000'
+		const res = await fetch(`${BASE_URL}/auth/send-otp`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ phone }),
+		})
+		if (!res.ok) {
+			let err
+			try { err = await res.json() } catch { err = null }
+			throw { response: { data: err || { error: 'Failed to send OTP' } } }
+		}
+		return { data: await res.json() }
 	},
-	verifyOtp({ phone, code, name }) {
-		return api.post('/auth/verify-otp', { phone, code, name })
+	async verifyOtp({ phone, code, name }) {
+		const BASE_URL = (import.meta && import.meta.env && import.meta.env.VITE_API_URL) || 'http://localhost:3000'
+		const res = await fetch(`${BASE_URL}/auth/verify-otp`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ phone, code, name }),
+		})
+		if (!res.ok) {
+			let err
+			try { err = await res.json() } catch { err = null }
+			throw { response: { data: err || { error: 'Invalid OTP' } } }
+		}
+		return { data: await res.json() }
 	},
 }
 
