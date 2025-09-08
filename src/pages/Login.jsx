@@ -14,6 +14,10 @@ function Login() {
 	const navigate = useNavigate()
 	const { requestOtp, verifyOtp } = useAuth()
 
+	function isE164(num) {
+		return /^\+\d{10,15}$/.test(num)
+	}
+
 	const handleNext = async (e) => {
 		e.preventDefault()
 		setError('')
@@ -22,12 +26,17 @@ function Login() {
 			return
 		}
 		if (!mobileNumber.trim()) return
+		if (!isE164(mobileNumber.trim())) {
+			setError('Enter phone in E.164 format, e.g. +9198XXXXXXXX')
+			return
+		}
 		try {
 			setLoading(true)
-			await requestOtp(mobileNumber)
+			await requestOtp(mobileNumber.trim())
 			setStep(2)
-		} catch (_err) {
-			setError('Failed to send OTP. Please check the number and try again.')
+		} catch (err) {
+			const msg = err?.response?.data?.error || 'Failed to send OTP. Please check the number and try again.'
+			setError(msg)
 		} finally {
 			setLoading(false)
 		}
@@ -42,10 +51,11 @@ function Login() {
 		if (!otp.trim()) return
 		try {
 			setLoading(true)
-			await verifyOtp({ phone: mobileNumber, code: otp, name })
+			await verifyOtp({ phone: mobileNumber.trim(), code: otp.trim(), name: name.trim() })
 			navigate('/')
-		} catch (_err) {
-			setError('Invalid OTP. Please try again.')
+		} catch (err) {
+			const msg = err?.response?.data?.error || 'Invalid OTP. Please try again.'
+			setError(msg)
 		} finally {
 			setLoading(false)
 		}
