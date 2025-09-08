@@ -11,6 +11,7 @@ const {
 	TWILIO_VERIFY_SERVICE_SID,
 	TWILIO_MESSAGING_FROM,
 	TWILIO_MESSAGING_SERVICE_SID,
+	ALLOW_DEV_OTP,
 	JWT_SECRET = 'dev_secret_change_me',
 } = process.env
 
@@ -47,6 +48,15 @@ router.post('/send-otp', async (req, res, next) => {
 			await twilioClient.verify.v2.services(TWILIO_VERIFY_SERVICE_SID)
 				.verifications.create({ to: phone, channel: 'sms' })
 			return res.json({ ok: true, mode: 'verify' })
+		}
+
+		// Dev fallback: generate/store OTP and return it for manual testing
+		if (ALLOW_DEV_OTP === 'true') {
+			const code = String(Math.floor(100000 + Math.random() * 900000))
+			const expiresAt = new Date(Date.now() + 5 * 60 * 1000)
+			await prisma.otpCode.create({ data: { phone, code, expiresAt } })
+			console.warn('[DEV_OTP] Twilio not configured. Generated OTP for', phone, 'code:', code)
+			return res.json({ ok: true, mode: 'dev', devCode: code })
 		}
 
 		return res.status(500).json({ error: 'Twilio not configured' })
