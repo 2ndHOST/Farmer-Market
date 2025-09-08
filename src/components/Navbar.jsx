@@ -34,7 +34,9 @@ function Navbar() {
 					</form>
 
 					{user ? (
-						<span className="inline-flex items-center justify-center rounded-lg bg-green-700 text-white shadow-md px-4 py-2 sm:px-3 sm:py-1 md:px-4 md:py-2">Profile: {user.name || user.phone}</span>
+						<button className="inline-flex items-center justify-center w-9 h-9 rounded-full bg-green-700 text-white shadow-md hover:bg-green-800 transition" title={user.name || user.phone} aria-label="Profile">
+							<span className="text-lg">👤</span>
+						</button>
 					) : (
 						<Link to="/login" className="inline-flex items-center justify-center rounded-lg bg-green-700 text-white shadow-md px-4 py-2 sm:px-3 sm:py-1 md:px-4 md:py-2 hover:bg-green-800 transition text-sm">Login</Link>
 					)}
@@ -59,7 +61,9 @@ function Navbar() {
 						</form>
 
 						{user ? (
-							<span className="inline-flex items-center justify-center rounded-lg bg-green-700 text-white shadow-md px-4 py-2">Profile: {user.name || user.phone}</span>
+							<button className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-green-700 text-white shadow-md hover:bg-green-800 transition" title={user.name || user.phone} aria-label="Profile">
+								<span className="text-xl">👤</span>
+							</button>
 						) : (
 							<Link to="/login" onClick={() => setOpen(false)} className="inline-flex items-center justify-center rounded-lg bg-green-700 text-white shadow-md px-4 py-2 hover:bg-green-800 transition text-center">Login</Link>
 						)}

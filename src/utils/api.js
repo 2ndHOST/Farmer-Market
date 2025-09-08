@@ -189,9 +189,19 @@ if (typeof window !== 'undefined') {
   }, 2500)
 }
 
+// Helper function to get API base URL with fallbacks
+function getApiBaseUrl() {
+	// Try Vite environment variable first
+	if (import.meta?.env?.VITE_API_URL) {
+		return import.meta.env.VITE_API_URL
+	}
+	// Fallback to localhost:3000 for development
+	return 'http://localhost:3000'
+}
+
 export const AuthAPI = {
 	async sendOtp(phone) {
-		const BASE_URL = (import.meta && import.meta.env && import.meta.env.VITE_API_URL) || 'http://localhost:3000'
+		const BASE_URL = getApiBaseUrl()
 		const res = await fetch(`${BASE_URL}/auth/send-otp`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
@@ -205,7 +215,7 @@ export const AuthAPI = {
 		return { data: await res.json() }
 	},
 	async verifyOtp({ phone, code, name }) {
-		const BASE_URL = (import.meta && import.meta.env && import.meta.env.VITE_API_URL) || 'http://localhost:3000'
+		const BASE_URL = getApiBaseUrl()
 		const res = await fetch(`${BASE_URL}/auth/verify-otp`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },

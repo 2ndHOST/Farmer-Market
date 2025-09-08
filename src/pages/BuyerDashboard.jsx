@@ -2,6 +2,7 @@ import Navbar from '../components/Navbar.jsx'
 import Footer from '../components/Footer.jsx'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { api } from '../utils/api.js'
+import useAuth from '../hooks/useAuth.js'
 
 function BuyerDashboard() {
 	const [listings, setListings] = useState([])
@@ -14,15 +15,27 @@ function BuyerDashboard() {
 	const [maxPrice, setMaxPrice] = useState('')
 	const [sortBy, setSortBy] = useState('createdAt-desc')
 	const newRowIdsRef = useRef(new Set())
+  const { user } = useAuth()
+  
+  // Helper function to get API base URL with fallbacks
+  function getApiBaseUrl() {
+    if (import.meta?.env?.VITE_API_URL) {
+      return import.meta.env.VITE_API_URL
+    }
+    return 'http://localhost:3000'
+  }
 
 	useEffect(() => {
 		let mounted = true
 		;(async () => {
 			try {
-				const [l, b] = await Promise.all([api.get('/listings'), api.get('/bids')])
+        const [l, b] = await Promise.all([
+          fetch(`${getApiBaseUrl()}/listings`).then(r=>r.json()).catch(()=>[]),
+          api.get('/bids').then(r=>r.data).catch(()=>[]),
+        ])
 				if (mounted) {
-					setListings(Array.isArray(l?.data) ? l.data : [])
-					setBids(Array.isArray(b?.data) ? b.data : [])
+					setListings(Array.isArray(l) ? l : [])
+					setBids(Array.isArray(b) ? b : [])
 				}
 			} finally { if (mounted) setLoading(false) }
 		})()
@@ -39,7 +52,7 @@ function BuyerDashboard() {
 		const unsubBids = api.subscribe?.('bids', (next) => { setBids(Array.isArray(next) ? next : []) })
 
 		return () => { mounted = false; unsubListings && unsubListings(); unsubBids && unsubBids() }
-	}, [])
+	}, [user])
 
 	const filteredAndSorted = useMemo(() => {
 		let data = Array.isArray(listings) ? listings.slice() : []
@@ -130,7 +143,7 @@ function BuyerDashboard() {
 												<td className="px-4 py-3">{item.unit || 'kg'}</td>
 												<td className="px-4 py-3">{item.quantity ?? '-'}</td>
 												<td className="px-4 py-3 text-green-700 font-semibold">{item.minPrice ?? item.price}</td>
-												<td className="px-4 py-3">{item.farmerName || '—'}</td>
+												<td className="px-4 py-3">{item.farmerName || '—'}{item.farmerPhone ? ` (${item.farmerPhone})` : ''}</td>
 												<td className="px-4 py-3">{item.location || '—'}</td>
 											</tr>
 										))
@@ -159,6 +172,10 @@ function BuyerDashboard() {
 									<div className="mt-2 flex gap-4 text-sm text-neutral-700">
 										<div><span className="font-medium">Qty:</span> {item.quantity ?? '-'}</div>
 										<div><span className="font-medium">Unit:</span> {item.unit || 'kg'}</div>
+									</div>
+									<div className="mt-2 text-sm text-neutral-700">
+										<div><span className="font-medium">Seller:</span> {item.farmerName || '—'}</div>
+										<div><span className="font-medium">Phone:</span> {item.farmerPhone || '—'}</div>
 									</div>
 								</div>
 							))

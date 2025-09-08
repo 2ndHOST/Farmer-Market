@@ -1,6 +1,6 @@
 datasource db {
 	provider = "sqlite"
-	url      = "file:./prisma/dev.db"
+	url      = "file:./dev.db"
 }
 
 generator client {
@@ -14,6 +14,7 @@ model Listing {
 	quantity   Float
 	minPrice   Float
 	farmerName String
+	farmerPhone String?
 	description String?
 	bids       Bid[]
 	createdAt  DateTime @default(now())

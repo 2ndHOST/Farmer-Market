@@ -17,7 +17,7 @@ dist-ssr
 
 # Backend node_modules
 backend/node_modules/
-backend/prisma/dev.db
+
 
 # Environments
 .env

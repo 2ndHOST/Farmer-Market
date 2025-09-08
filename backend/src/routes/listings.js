@@ -18,9 +18,10 @@ router.get('/', async (req, res, next) => {
 	} catch (e) { next(e) }
 })
 
+
 router.post('/', async (req, res, next) => {
 	try {
-		const { crop, unit = 'kg', quantity, minPrice, farmerName = 'Unknown', description = null } = req.body || {}
+		const { crop, unit = 'kg', quantity, minPrice, farmerName = 'Unknown', farmerPhone = null } = req.body || {}
 		if (!crop || quantity == null || minPrice == null) {
 			return res.status(400).json({ error: 'crop, minPrice and quantity are required' })
 		}
@@ -30,7 +31,7 @@ router.post('/', async (req, res, next) => {
 			return res.status(400).json({ error: 'minPrice and quantity must be numbers' })
 		}
 		const listing = await prisma.listing.create({
-			data: { crop, unit, quantity: qtyNum, minPrice: priceNum, farmerName, description },
+			data: { crop, unit, quantity: qtyNum, minPrice: priceNum, farmerName, farmerPhone },
 		})
 		res.status(201).json(listing)
 	} catch (e) { next(e) }

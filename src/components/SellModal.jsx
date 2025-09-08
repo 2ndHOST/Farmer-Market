@@ -1,9 +1,11 @@
 import { useState } from 'react'
+import useAuth from '../hooks/useAuth.js'
 
 function SellModal({ open, onClose, onSuccess }) {
   const [form, setForm] = useState({ name: '', minPrice: '', quantity: '', description: '' })
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
+  const { user } = useAuth()
 
   if (!open) return null
 
@@ -27,10 +29,17 @@ function SellModal({ open, onClose, onSuccess }) {
     }
     setSubmitting(true)
     try {
-      const res = await fetch('http://localhost:3000/listings', {
+      // Helper function to get API base URL with fallbacks
+      function getApiBaseUrl() {
+        if (import.meta?.env?.VITE_API_URL) {
+          return import.meta.env.VITE_API_URL
+        }
+        return 'http://localhost:3000'
+      }
+      const res = await fetch(`${getApiBaseUrl()}/listings`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ crop: name, minPrice: priceNum, quantity: qtyNum, description, unit: 'kg' }),
+        body: JSON.stringify({ crop: name, minPrice: priceNum, quantity: qtyNum, unit: 'kg', farmerName: user?.name || 'Unknown', farmerPhone: user?.phone || null }),
       })
       if (!res.ok) {
         const data = await res.json().catch(() => ({}))

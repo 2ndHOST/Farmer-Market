@@ -11,9 +11,17 @@ function FarmerDashboard() {
 	const [successMsg, setSuccessMsg] = useState('')
 	const [items, setItems] = useState([])
 
+	// Helper function to get API base URL with fallbacks
+	function getApiBaseUrl() {
+		if (import.meta?.env?.VITE_API_URL) {
+			return import.meta.env.VITE_API_URL
+		}
+		return 'http://localhost:3000'
+	}
+
 	async function fetchListings() {
 		try {
-			const res = await fetch('http://localhost:3000/listings')
+			const res = await fetch(`${getApiBaseUrl()}/listings`)
 			const data = await res.json()
 			setItems(Array.isArray(data) ? data : [])
 		} catch {}
@@ -36,7 +44,7 @@ function FarmerDashboard() {
 					) : null}
 					<div className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
 						{items.map(item => (
-							<ListingCard key={item.id} title={item.crop} price={item.minPrice} onClick={() => setOpen(true)} />
+							<ListingCard key={item.id} title={item.crop} price={item.minPrice} sellerName={item.farmerName} sellerPhone={item.farmerPhone} onClick={() => setOpen(true)} />
 						))}
 						{items.length === 0 ? (
 							<div className="text-neutral-500">No listings yet. Use Sell to add one.</div>

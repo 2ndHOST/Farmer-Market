@@ -41,9 +41,27 @@ API base: `http://localhost:3000`
 - Node.js 18+
 - npm (or pnpm/yarn)
 
-### 1) Install dependencies
+### Quick Setup (Recommended)
 
+Run the setup script to automatically install dependencies and configure the project:
+
+```bash
+./setup.sh
 ```
+
+This will:
+- Install all dependencies (frontend + backend)
+- Create environment files from examples
+- Set up the database with Prisma
+- Generate Prisma client
+
+### Manual Setup
+
+If you prefer to set up manually:
+
+#### 1) Install dependencies
+
+```bash
 # Frontend (root)
 npm install
 
@@ -52,29 +70,24 @@ cd backend
 npm install
 ```
 
-### 2) Environment variables (Backend)
-Create `backend/.env` with at least:
+#### 2) Environment variables
 
-```
-# Database
-DATABASE_URL="file:./dev.db"
-
-# Server
-PORT=3000
-CORS_ORIGIN=http://localhost:5173
-
-# Auth
-JWT_SECRET=replace-with-a-strong-secret
-
-# Twilio (for OTP)
-TWILIO_ACCOUNT_SID=...
-TWILIO_AUTH_TOKEN=...
-TWILIO_PHONE_NUMBER=+1...
+**Backend**: Copy `backend/.env.example` to `backend/.env`:
+```bash
+cd backend
+cp .env.example .env
 ```
 
-### 3) Prisma setup (Backend)
-
+**Frontend**: Copy `.env.example` to `.env`:
+```bash
+cp .env.example .env
 ```
+
+The example files contain all necessary defaults. For development, you can use the defaults as-is. The backend will use dev OTP mode when Twilio is not configured.
+
+#### 3) Prisma setup (Backend)
+
+```bash
 cd backend
 npm run prisma:generate
 npm run prisma:migrate
@@ -82,9 +95,9 @@ npm run prisma:migrate
 
 This uses SQLite with the schema in `backend/prisma/schema.prisma` (models: `Listing`, `Bid`, `User`, `OtpCode`).
 
-### 4) Run in development
+### Run in development
 
-```
+```bash
 # Backend (http://localhost:3000)
 cd backend
 npm run dev
@@ -93,6 +106,10 @@ npm run dev
 cd ..
 npm run dev
 ```
+
+### Testing Login
+
+The backend runs in dev OTP mode by default (no Twilio required). When you request an OTP, check the backend console for the generated code to use for login.
 
 ---
 

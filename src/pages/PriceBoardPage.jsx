@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import Navbar from '../components/Navbar.jsx'
+import useAuth from '../hooks/useAuth.js'
 import Footer from '../components/Footer.jsx'
 import BidModal from '../components/BidModal.jsx'
 import { api } from '../utils/api.js'
@@ -11,16 +12,29 @@ function PriceBoardPage() {
 	const [open, setOpen] = useState(false)
 	const [query, setQuery] = useState('')
 	const [sortAsc, setSortAsc] = useState(true)
+  const { user } = useAuth()
+  
+  // Helper function to get API base URL with fallbacks
+  function getApiBaseUrl() {
+    if (import.meta?.env?.VITE_API_URL) {
+      return import.meta.env.VITE_API_URL
+    }
+    return 'http://localhost:3000'
+  }
 
 	useEffect(() => {
 		let mounted = true
 		;(async () => {
-			const res = await api.get('/listings')
-			if (mounted) setListings(Array.isArray(res?.data) ? res.data : [])
-			setLoading(false)
+      try {
+        const res = await fetch(`${getApiBaseUrl()}/listings`)
+        const data = await res.json()
+        if (mounted) setListings(Array.isArray(data) ? data : [])
+      } finally {
+				setLoading(false)
+			}
 		})()
 		return () => { mounted = false }
-	}, [])
+	}, [user])
 
 	function openBid(listing) {
 		setSelected(listing)
@@ -86,15 +100,15 @@ function PriceBoardPage() {
 												<td className="px-4 py-3">{item.unit || 'kg'}</td>
 												<td className="px-4 py-3">{item.quantity ?? '-'}</td>
 												<td className="px-4 py-3 text-[--color-agri-green] font-semibold">{item.minPrice ?? item.price}</td>
-												<td className="px-4 py-3">{item.farmerName || '—'}</td>
+												<td className="px-4 py-3">{item.farmerName || '—'}{item.farmerPhone ? ` (${item.farmerPhone})` : ''}</td>
 												<td className="px-4 py-3">
 													<button onClick={() => openBid(item)} className="rounded-lg bg-green-700 text-white px-3 py-2 shadow-md hover:bg-green-800 transition">Place Bid</button>
 												</td>
 											</tr>
 										))
 									)}
-							</tbody>
-						</table>
+								</tbody>
+							</table>
 						</div>
 					</div>
 				</div>
