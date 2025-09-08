@@ -1,4 +1,6 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { LocationProvider } from './contexts/LocationContext'
+import { LanguageProvider } from './contexts/LanguageContext'
 import Landing from './pages/Landing.jsx'
 import Login from './pages/Login.jsx'
 import FarmerDashboard from './pages/FarmerDashboard.jsx'
@@ -8,16 +10,20 @@ import EquipmentRentalPage from './pages/EquipmentRentalPage.jsx'
 
 function App() {
 	return (
-		<BrowserRouter>
-			<Routes>
-				<Route path="/" element={<Landing />} />
-				<Route path="/login" element={<Login />} />
-				<Route path="/farmer" element={<FarmerDashboard />} />
-				<Route path="/buyer" element={<BuyerDashboard />} />
-				<Route path="/prices" element={<PriceBoardPage />} />
-				<Route path="/equipment" element={<EquipmentRentalPage />} />
-			</Routes>
-		</BrowserRouter>
+		<LanguageProvider>
+			<LocationProvider>
+				<BrowserRouter>
+					<Routes>
+						<Route path="/" element={<Landing />} />
+						<Route path="/login" element={<Login />} />
+						<Route path="/farmer" element={<FarmerDashboard />} />
+						<Route path="/buyer" element={<BuyerDashboard />} />
+						<Route path="/prices" element={<PriceBoardPage />} />
+						<Route path="/equipment" element={<EquipmentRentalPage />} />
+					</Routes>
+				</BrowserRouter>
+			</LocationProvider>
+		</LanguageProvider>
 	)
 }
 

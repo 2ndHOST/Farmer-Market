@@ -2,6 +2,10 @@ import Navbar from '../components/Navbar.jsx'
 import Footer from '../components/Footer.jsx'
 import { useEffect, useMemo, useState } from 'react'
 import { api } from '../utils/api.js'
+import { useLocation } from '../contexts/LocationContext'
+import { filterByLocation, addDistanceToItems, sortByDistance, formatDistance } from '../utils/locationUtils.js'
+import { MapPin, Settings, Plus } from 'lucide-react'
+import AddEquipmentModal from '../components/AddEquipmentModal.jsx'
 
 function TypeIcon({ type }) {
   const base = 'h-6 w-6 text-[--color-agri-green]'
@@ -15,6 +19,13 @@ function TypeIcon({ type }) {
         <svg className={base} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true"><path d="M7 7h10v10H7z"/><path d="M12 2v5M12 17v5"/></svg>
       )
     case 'rotavator':
+      return (
+        <svg className={base} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M4 12h4M16 12h4M12 4v4M12 16v4"/></svg>
+      )
+    case 'custom':
+      return (
+        <svg className={base} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+      )
     default:
       return (
         <svg className={base} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M4 12h4M16 12h4M12 4v4M12 16v4"/></svg>
@@ -34,7 +45,14 @@ function EquipmentCard({ item, onRequest }) {
 				<TypeIcon type={item.type} />
 				<h3 className="text-xl font-semibold text-green-800">{item.title}</h3>
 			</div>
-			<p className="text-sm text-neutral-600">{item.location}</p>
+			<div className="flex items-center justify-between">
+				<p className="text-sm text-neutral-600">{item.location}</p>
+				{item.distance !== null && (
+					<p className="text-xs text-green-600 font-medium">
+						{formatDistance(item.distance)} away
+					</p>
+				)}
+			</div>
 			<div className="mt-3 space-y-1">
 				{item.rentPerDay != null && (
 					<div className="text-sm"><span className="font-medium">Rent:</span> ₹ {item.rentPerDay} / day</div>
@@ -56,10 +74,33 @@ function EquipmentRentalPage() {
 	const [barterType, setBarterType] = useState('produce')
 	const [description, setDescription] = useState('')
 	const [contact, setContact] = useState('')
+	const [showAddModal, setShowAddModal] = useState(false)
+	const { location, radius, isLocationSet } = useLocation()
+	
 	const filtered = useMemo(() => {
-		const data = Array.isArray(items) ? items : []
-		return onlyBarter ? data.filter(e => !!e.barter) : data
-	}, [items, onlyBarter])
+		let data = Array.isArray(items) ? items : []
+		
+		// Filter by barter option
+		if (onlyBarter) {
+			data = data.filter(e => !!e.barter)
+		}
+		
+		// Filter by location if set
+		if (isLocationSet && location) {
+			// Add mock location data to equipment for demo
+			const itemsWithLocation = data.map(item => ({
+				...item,
+				lat: 19.0760 + (Math.random() - 0.5) * 0.2, // Mock coordinates around Mumbai
+				lng: 72.8777 + (Math.random() - 0.5) * 0.2
+			}))
+			
+			data = filterByLocation(itemsWithLocation, location, radius)
+			data = addDistanceToItems(data, location)
+			data = sortByDistance(data)
+		}
+		
+		return data
+	}, [items, onlyBarter, location, radius, isLocationSet])
 
 	useEffect(() => {
 		let mounted = true
@@ -84,14 +125,58 @@ function EquipmentRentalPage() {
 		alert('Request sent')
 	}
 
+	function handleAddEquipment(newEquipment) {
+		// Add new equipment to the local state
+		setItems(prev => [newEquipment, ...prev])
+		
+		// For future backend integration, you would make an API call here:
+		// await api.post('/equipment', newEquipment)
+		
+		console.log('New equipment added:', newEquipment)
+	}
+
 	function request(item) { setActive(item) }
 	return (
 		<div className="min-h-screen flex flex-col bg-gradient-to-b from-green-50 to-green-100">
 			<Navbar />
 			<main className="flex-1">
 				<div className="mx-auto max-w-7xl px-4 py-12">
-					<h1 className="text-xl font-semibold text-green-800">Equipment Rental</h1>
-					<p className="mt-2 text-neutral-700">Rent farm equipment. Pay with money or barter options.</p>
+					<div className="flex items-center justify-between mb-4">
+						<div>
+							<h1 className="text-xl font-semibold text-green-800">Equipment Rental</h1>
+							<p className="mt-2 text-neutral-700">Rent farm equipment. Pay with money or barter options.</p>
+						</div>
+						<div className="flex items-center gap-4">
+							{isLocationSet && (
+								<div className="flex items-center gap-2 bg-green-50 px-3 py-2 rounded-lg">
+									<MapPin className="h-4 w-4 text-green-600" />
+									<span className="text-sm text-green-800">
+										{location.address} ({radius}km radius)
+									</span>
+								</div>
+							)}
+							<button
+								onClick={() => setShowAddModal(true)}
+								className="flex items-center gap-2 bg-green-700 text-white px-4 py-2 rounded-lg shadow-md hover:bg-green-800 transition-colors"
+							>
+								<Plus className="h-4 w-4" />
+								<span>Add Equipment</span>
+							</button>
+						</div>
+					</div>
+					
+					{!isLocationSet && (
+						<div className="mb-4 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+							<div className="flex items-center gap-2">
+								<Settings className="h-5 w-5 text-yellow-600" />
+								<div>
+									<p className="text-yellow-800 font-medium">Set your location to see nearby equipment</p>
+									<p className="text-yellow-700 text-sm">Go to the <a href="/" className="underline">Home page</a> to set your area radius</p>
+								</div>
+							</div>
+						</div>
+					)}
+					
 					<div className="mt-4 card-base p-4">
 						<label className="inline-flex items-center gap-2 text-sm">
 							<input type="checkbox" className="h-4 w-4" checked={onlyBarter} onChange={e=>setOnlyBarter(e.target.checked)} />
@@ -166,6 +251,13 @@ function EquipmentRentalPage() {
 					</div>
 				</div>
 			)}
+			
+			{/* Add Equipment Modal */}
+			<AddEquipmentModal
+				isOpen={showAddModal}
+				onClose={() => setShowAddModal(false)}
+				onSubmit={handleAddEquipment}
+			/>
 		</div>
 	)
 }
