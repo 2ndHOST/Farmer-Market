@@ -12,6 +12,7 @@ function Navbar() {
 				</Link>
 				<nav className="hidden sm:flex items-center gap-6 text-sm font-medium text-neutral-700">
 					<Link to="/" className="hover:text-[--color-agri-green]">Home</Link>
+					<Link to="/prices" className="hover:text-[--color-agri-green]">Price Board</Link>
 					<a href="#about" className="hover:text-[--color-agri-green]">About</a>
 					<a href="#contact" className="hover:text-[--color-agri-green]">Contact</a>
 					<Link to="/login" className="inline-flex items-center justify-center rounded-lg bg-green-700 text-white shadow-md px-4 py-2 sm:px-3 sm:py-1 md:px-4 md:py-2 hover:bg-green-800 transition text-sm">Login</Link>
@@ -24,6 +25,7 @@ function Navbar() {
 				<div className="sm:hidden border-t border-neutral-200">
 					<div className="px-4 py-3 flex flex-col gap-3 text-sm font-medium">
 						<Link to="/" onClick={() => setOpen(false)} className="hover:text-[--color-agri-green]">Home</Link>
+						<Link to="/prices" onClick={() => setOpen(false)} className="hover:text-[--color-agri-green]">Price Board</Link>
 						<a href="#about" onClick={() => setOpen(false)} className="hover:text-[--color-agri-green]">About</a>
 						<a href="#contact" onClick={() => setOpen(false)} className="hover:text-[--color-agri-green]">Contact</a>
 						<Link to="/login" onClick={() => setOpen(false)} className="inline-flex items-center justify-center rounded-lg bg-green-700 text-white shadow-md px-4 py-2 hover:bg-green-800 transition text-center">Login</Link>

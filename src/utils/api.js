@@ -1,12 +1,13 @@
-// Axios instance placeholder
-// Replace with real baseURL and interceptors later
-export function createApiClient() {
-	return {
-		get: async (url) => Promise.resolve({ data: null, url }),
-		post: async (url, body) => Promise.resolve({ data: body, url }),
-	}
-}
+import axios from 'axios'
 
-export const api = createApiClient()
+export const api = axios.create({
+	baseURL: 'http://localhost:3000',
+})
+
+api.interceptors.request.use((config) => {
+	const token = localStorage.getItem('token')
+	if (token) config.headers.Authorization = `Bearer ${token}`
+	return config
+})
 
 
