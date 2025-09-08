@@ -4,12 +4,15 @@ import ListingCard from '../components/ListingCard.jsx'
 import { useEffect, useState } from 'react'
 import BidModal from '../components/BidModal.jsx'
 import SellModal from '../components/SellModal.jsx'
+import { useLocation } from '../contexts/LocationContext'
+import { MapPin, Settings } from 'lucide-react'
 
 function FarmerDashboard() {
 	const [open, setOpen] = useState(false)
 	const [sellOpen, setSellOpen] = useState(false)
 	const [successMsg, setSuccessMsg] = useState('')
 	const [items, setItems] = useState([])
+	const { location, radius, isLocationSet } = useLocation()
 
 	// Helper function to get API base URL with fallbacks
 	function getApiBaseUrl() {
@@ -33,12 +36,34 @@ function FarmerDashboard() {
 			<Navbar />
 			<main className="flex-1">
 				<div className="mx-auto max-w-7xl px-4 py-12">
-					<div className="flex items-center justify-between">
+					<div className="flex items-center justify-between mb-6">
 						<h1 className="text-3xl font-bold text-neutral-900">My Listings</h1>
-						<button onClick={() => { setSellOpen(true); setSuccessMsg('') }} className="inline-flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition shadow">
-							<span>Sell</span>
-						</button>
+						<div className="flex items-center gap-4">
+							{isLocationSet && (
+								<div className="flex items-center gap-2 bg-green-50 px-3 py-2 rounded-lg">
+									<MapPin className="h-4 w-4 text-green-600" />
+									<span className="text-sm text-green-800">
+										{location.address} ({radius}km radius)
+									</span>
+								</div>
+							)}
+							<button onClick={() => { setSellOpen(true); setSuccessMsg('') }} className="inline-flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition shadow">
+								<span>Sell</span>
+							</button>
+						</div>
 					</div>
+					
+					{!isLocationSet && (
+						<div className="mb-6 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+							<div className="flex items-center gap-2">
+								<Settings className="h-5 w-5 text-yellow-600" />
+								<div>
+									<p className="text-yellow-800 font-medium">Set your location to see nearby buyers and equipment</p>
+									<p className="text-yellow-700 text-sm">Go to the <a href="/" className="underline">Home page</a> to set your area radius</p>
+								</div>
+							</div>
+						</div>
+					)}
 					{successMsg ? (
 						<div className="mt-4 rounded-lg bg-green-50 text-green-700 px-4 py-2 border border-green-200">{successMsg}</div>
 					) : null}

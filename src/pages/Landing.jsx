@@ -1,8 +1,12 @@
 import Navbar from '../components/Navbar.jsx'
 import Footer from '../components/Footer.jsx'
+import AreaSelector from '../components/AreaSelector.jsx'
 import { useState } from 'react'
+import { useLanguage } from '../contexts/LanguageContext'
 
 function Hero() {
+	const { t } = useLanguage()
+	
 	return (
 		<section id="home" className="relative overflow-hidden">
 			<div
@@ -16,27 +20,27 @@ function Hero() {
 			<div className="relative mx-auto max-w-7xl px-4 py-16 sm:py-20 md:py-24">
 				<div className="max-w-3xl">
 					<h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-neutral-900">
-						Direct connection between farmers & buyers. Fair prices. No middlemen.
+						{t('heroTitle')}
 					</h1>
 					<p className="mt-4 text-lg sm:text-xl text-neutral-700">
-						Empowering farmers, supporting buyers.
+						{t('heroSubtitle')}
 					</p>
 					<div className="mt-8 flex flex-col sm:flex-row gap-4">
 						<a
 							href="/farmer"
 							className="inline-flex items-center justify-center rounded-lg bg-green-700 text-white shadow-md focus:outline-none focus:ring-2 focus:ring-green-600 focus:ring-offset-2 px-6 py-3 sm:px-8 sm:py-3 md:px-10 md:py-4 hover:bg-green-800 transition text-lg md:text-xl"
 						>
-							I am a Farmer 👨‍🌾
+							{t('farmerButton')}
 						</a>
 						<a href="/buyer" className="inline-flex items-center justify-center rounded-lg bg-green-700 text-white shadow-md px-6 py-3 sm:px-8 sm:py-3 md:px-10 md:py-4 hover:bg-green-800 transition text-lg md:text-xl">
-							I am a Buyer 🛒
+							{t('buyerButton')}
 						</a>
-						<a href="/equipment" className="inline-flex items-center justify-center rounded-lg bg-green-700 text-white shadow-md px-6 py-3 sm:px-8 sm:py-3 md:px-10 md:py-4 hover:bg-green-800 transition text-lg md:text-xl">Rent Equipment 🚜</a>
+						<a href="/equipment" className="inline-flex items-center justify-center rounded-lg bg-green-700 text-white shadow-md px-6 py-3 sm:px-8 sm:py-3 md:px-10 md:py-4 hover:bg-green-800 transition text-lg md:text-xl">{t('equipmentButton')}</a>
 					</div>
 
 					<div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-6 text-neutral-700">
-						<p className="card-base p-4 bg-white/80"><span className="font-semibold">I am a Farmer:</span> Sell crops directly, access fair prices, and rent machinery at affordable rates.</p>
-						<p className="card-base p-4 bg-white/80"><span className="font-semibold">I am a Buyer:</span> Buy fresh produce, bid transparently, and support local farmers.</p>
+						<p className="card-base p-4 bg-white/80"><span className="font-semibold">{t('farmerDescription').split(':')[0]}:</span> {t('farmerDescription').split(':')[1]}</p>
+						<p className="card-base p-4 bg-white/80"><span className="font-semibold">{t('buyerDescription').split(':')[0]}:</span> {t('buyerDescription').split(':')[1]}</p>
 					</div>
 				</div>
 
@@ -51,16 +55,18 @@ function Hero() {
 import { Users } from 'lucide-react'
 
 function Benefits() {
+	const { t } = useLanguage()
+	
 	return (
 		<section className="mx-auto max-w-7xl px-4 py-12 sm:py-16" aria-labelledby="why">
-			<h2 id="why" className="text-3xl sm:text-4xl font-bold text-neutral-900">Why AgriConnect?</h2>
+			<h2 id="why" className="text-3xl sm:text-4xl font-bold text-neutral-900">{t('whyAgriConnect')}</h2>
 			<div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
 				<div className="card-base p-6">
 					<div className="flex items-start gap-4">
 						<div className="text-3xl">👨‍🌾</div>
 						<div>
-							<h3 className="text-xl font-semibold text-neutral-900">For Farmers</h3>
-							<p className="mt-1 text-neutral-700">Sell directly to buyers, get better prices, avoid middlemen.</p>
+							<h3 className="text-xl font-semibold text-neutral-900">{t('forFarmers')}</h3>
+							<p className="mt-1 text-neutral-700">{t('forFarmersDesc')}</p>
 						</div>
 					</div>
 				</div>
@@ -68,8 +74,8 @@ function Benefits() {
 					<div className="flex items-start gap-4">
 						<div className="text-3xl">🛒</div>
 						<div>
-							<h3 className="text-xl font-semibold text-neutral-900">For Buyers</h3>
-							<p className="mt-1 text-neutral-700">Buy fresh produce, transparent pricing, support farmers.</p>
+							<h3 className="text-xl font-semibold text-neutral-900">{t('forBuyers')}</h3>
+							<p className="mt-1 text-neutral-700">{t('forBuyersDesc')}</p>
 						</div>
 					</div>
 				</div>
@@ -77,8 +83,8 @@ function Benefits() {
 					<div className="flex items-start gap-4">
 						<Users className="text-green-700" />
 						<div>
-							<h3 className="text-xl font-semibold text-neutral-900">For Community</h3>
-							<p className="mt-1 text-neutral-700">Farmers can collaborate, share equipment, and support each other.</p>
+							<h3 className="text-xl font-semibold text-neutral-900">{t('forCommunity')}</h3>
+							<p className="mt-1 text-neutral-700">{t('forCommunityDesc')}</p>
 						</div>
 					</div>
 				</div>
@@ -88,15 +94,17 @@ function Benefits() {
 }
 
 function HowItWorks() {
+	const { t } = useLanguage()
+	
 	const steps = [
-		{ icon: '📋', title: 'Step 1', text: 'Farmer lists crops.' },
-		{ icon: '💰', title: 'Step 2', text: 'Buyers place bids.' },
-		{ icon: '🤝', title: 'Step 3', text: 'Deal is finalized.' },
-		{ icon: '🚜', title: 'Step 4', text: 'Rent or borrow equipment from nearby farmers.' },
+		{ icon: '📋', title: t('step1'), text: t('step1Desc') },
+		{ icon: '💰', title: t('step2'), text: t('step2Desc') },
+		{ icon: '🤝', title: t('step3'), text: t('step3Desc') },
+		{ icon: '🚜', title: t('step4'), text: t('step4Desc') },
 	]
 	return (
 		<section className="mx-auto max-w-7xl px-4 py-12 sm:py-16" aria-labelledby="how">
-			<h2 id="how" className="text-3xl sm:text-4xl font-bold text-neutral-900">How It Works</h2>
+			<h2 id="how" className="text-3xl sm:text-4xl font-bold text-neutral-900">{t('howItWorks')}</h2>
 			<div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
 				{steps.map((s, idx) => (
 					<div key={idx} className="card-base p-6 group hover:-translate-y-0.5 transform transition">
@@ -116,6 +124,9 @@ function Landing() {
 			<Navbar />
 			<main className="flex-1">
 				<Hero />
+				<section className="mx-auto max-w-7xl px-4 py-8">
+					<AreaSelector />
+				</section>
 				<Benefits />
 				<HowItWorks />
 			</main>
