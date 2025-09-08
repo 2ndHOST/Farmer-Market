@@ -1,0 +1,30 @@
+datasource db {
+	provider = "postgresql"
+	url      = env("DATABASE_URL")
+}
+
+generator client {
+	provider = "prisma-client-js"
+}
+
+model Listing {
+	id         String   @id @default(cuid())
+	crop       String
+	unit       String
+	quantity   Float
+	minPrice   Float
+	farmerName String
+	bids       Bid[]
+	createdAt  DateTime @default(now())
+}
+
+model Bid {
+	id        String   @id @default(cuid())
+	amount    Float
+	buyerName String?
+	listing   Listing  @relation(fields: [listingId], references: [id])
+	listingId String
+	createdAt DateTime @default(now())
+}
+
+
