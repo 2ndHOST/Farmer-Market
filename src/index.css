@@ -15,7 +15,19 @@ body,
 }
 
 body {
-	@apply bg-white text-neutral-800 antialiased;
+	@apply bg-green-50 text-neutral-800 antialiased;
+	position: relative;
+}
+
+/* Subtle greenish hue across the site */
+body::before {
+	content: "";
+	position: fixed;
+	inset: 0;
+	z-index: -1;
+	background:
+		radial-gradient(800px 400px at 85% 25%, rgba(187, 247, 208, 0.45), transparent 60%),
+		radial-gradient(700px 350px at 10% 75%, rgba(220, 252, 231, 0.5), transparent 60%);
 }
 
 /* Utility shortcuts */

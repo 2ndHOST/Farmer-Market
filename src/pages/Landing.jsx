@@ -5,7 +5,14 @@ import { useState } from 'react'
 function Hero() {
 	return (
 		<section id="home" className="relative overflow-hidden">
-			<div className="absolute inset-0 bg-gradient-to-b from-green-50 via-[--color-agri-beige] to-white" aria-hidden="true" />
+			<div
+				className="absolute inset-0"
+				aria-hidden="true"
+				style={{
+					background:
+						'radial-gradient(900px 450px at 85% 25%, rgba(187, 247, 208, 0.45), transparent 60%), radial-gradient(800px 400px at 10% 75%, rgba(220, 252, 231, 0.5), transparent 60%)',
+				}}
+			/>
 			<div className="relative mx-auto max-w-7xl px-4 py-16 sm:py-20 md:py-24">
 				<div className="max-w-3xl">
 					<h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-neutral-900">
@@ -15,17 +22,20 @@ function Hero() {
 						Empowering farmers, supporting buyers.
 					</p>
 					<div className="mt-8 flex flex-col sm:flex-row gap-4">
-						<a href="/farmer" className="btn-primary text-base sm:text-lg">
+						<a
+							href="/farmer"
+							className="inline-flex items-center justify-center rounded-lg bg-green-700 text-white shadow-md focus:outline-none focus:ring-2 focus:ring-green-600 focus:ring-offset-2 px-6 py-3 sm:px-8 sm:py-3 md:px-10 md:py-4 hover:bg-green-800 transition text-lg md:text-xl"
+						>
 							I am a Farmer 👨‍🌾
 						</a>
-						<a href="/buyer" className="btn-primary text-base sm:text-lg !bg-emerald-600 hover:!bg-emerald-700">
+						<a href="/buyer" className="inline-flex items-center justify-center rounded-lg bg-green-700 text-white shadow-md px-6 py-3 sm:px-8 sm:py-3 md:px-10 md:py-4 hover:bg-green-800 transition text-lg md:text-xl">
 							I am a Buyer 🛒
 						</a>
 					</div>
 				</div>
 
 				<div className="pointer-events-none absolute -right-10 -bottom-10 h-64 w-64 sm:h-80 sm:w-80 opacity-20">
-					<div className="h-full w-full bg-[radial-gradient(circle_at_30%_30%,#86efac_0,transparent_60%),radial-gradient(circle_at_70%_70%,#a7f3d0_0,transparent_55%)]" />
+					<div className="h-full w-full bg-[radial-gradient(circle_at_30%_30%,rgba(187,247,208,0.45)_0,transparent_60%),radial-gradient(circle_at_70%_70%,rgba(220,252,231,0.5)_0,transparent_55%)]" />
 				</div>
 			</div>
 		</section>

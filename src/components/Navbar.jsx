@@ -14,7 +14,7 @@ function Navbar() {
 					<Link to="/" className="hover:text-[--color-agri-green]">Home</Link>
 					<a href="#about" className="hover:text-[--color-agri-green]">About</a>
 					<a href="#contact" className="hover:text-[--color-agri-green]">Contact</a>
-					<Link to="/login" className="btn-primary px-4 py-2 text-sm">Login</Link>
+					<Link to="/login" className="inline-flex items-center justify-center rounded-lg bg-green-700 text-white shadow-md px-4 py-2 sm:px-3 sm:py-1 md:px-4 md:py-2 hover:bg-green-800 transition text-sm">Login</Link>
 				</nav>
 				<button aria-label="Toggle Menu" className="sm:hidden p-2 rounded-md hover:bg-neutral-100" onClick={() => setOpen((v) => !v)}>
 					<span className="i-heroicons-bars-3 text-2xl">≡</span>
@@ -26,7 +26,7 @@ function Navbar() {
 						<Link to="/" onClick={() => setOpen(false)} className="hover:text-[--color-agri-green]">Home</Link>
 						<a href="#about" onClick={() => setOpen(false)} className="hover:text-[--color-agri-green]">About</a>
 						<a href="#contact" onClick={() => setOpen(false)} className="hover:text-[--color-agri-green]">Contact</a>
-						<Link to="/login" onClick={() => setOpen(false)} className="btn-primary text-center py-2">Login</Link>
+						<Link to="/login" onClick={() => setOpen(false)} className="inline-flex items-center justify-center rounded-lg bg-green-700 text-white shadow-md px-4 py-2 hover:bg-green-800 transition text-center">Login</Link>
 					</div>
 				</div>
 			)}
