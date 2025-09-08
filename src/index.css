@@ -38,3 +38,13 @@ body::before {
 .card-base {
 	@apply rounded-2xl bg-white shadow-md hover:shadow-lg transition-shadow;
 }
+
+/* Fade-in for new/updated rows */
+.fade-in {
+	animation: fadeIn 500ms ease-out;
+}
+
+@keyframes fadeIn {
+	0% { opacity: 0; transform: translateY(4px); }
+	100% { opacity: 1; transform: translateY(0); }
+}

@@ -1,3 +1,6 @@
+# Ignore Testsprite generated files
+testsprite_tests/
+
 # Logs
 logs
 *.log
