@@ -1,21 +1,48 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import useAuth from '../hooks/useAuth.js'
 import { useLanguage } from '../contexts/LanguageContext'
-import { Languages } from 'lucide-react'
+import { Languages, LogOut, User } from 'lucide-react'
 
 function Navbar() {
 	const [open, setOpen] = useState(false)
+	const [userMenuOpen, setUserMenuOpen] = useState(false)
 	const [query, setQuery] = useState('')
 	const navigate = useNavigate()
-	const { user } = useAuth()
+	const { user, logout } = useAuth()
 	const { t, toggleLanguage, isHindi } = useLanguage()
+	const userMenuRef = useRef(null)
 
 	function onSearch(e) {
 		e.preventDefault()
 		if (!query.trim()) return
 		navigate('/prices')
 	}
+
+	// Handle logout
+	async function handleLogout() {
+		try {
+			await logout()
+			setUserMenuOpen(false)
+			navigate('/')
+		} catch (error) {
+			console.error('Logout error:', error)
+		}
+	}
+
+	// Close user menu when clicking outside
+	useEffect(() => {
+		function handleClickOutside(event) {
+			if (userMenuRef.current && !userMenuRef.current.contains(event.target)) {
+				setUserMenuOpen(false)
+			}
+		}
+
+		document.addEventListener('mousedown', handleClickOutside)
+		return () => {
+			document.removeEventListener('mousedown', handleClickOutside)
+		}
+	}, [])
 
 	return (
 		<header className="sticky top-0 z-50 w-full bg-white/80 backdrop-blur supports-[backdrop-filter]:bg-white/60 shadow">
@@ -47,9 +74,33 @@ function Navbar() {
 					</button>
 
 					{user ? (
-						<button className="inline-flex items-center justify-center w-9 h-9 rounded-full bg-green-700 text-white shadow-md hover:bg-green-800 transition" title={user.name || user.phone} aria-label="Profile">
-							<span className="text-lg">👤</span>
-						</button>
+						<div className="relative" ref={userMenuRef}>
+							<button 
+								onClick={() => setUserMenuOpen(!userMenuOpen)}
+								className="inline-flex items-center justify-center w-9 h-9 rounded-full bg-green-700 text-white shadow-md hover:bg-green-800 transition" 
+								title={user.name || user.phone} 
+								aria-label="Profile"
+							>
+								<User className="h-5 w-5" />
+							</button>
+							
+							{/* User Dropdown Menu */}
+							{userMenuOpen && (
+								<div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50">
+									<div className="px-4 py-2 border-b border-gray-100">
+										<p className="text-sm font-medium text-gray-900">{user.name || 'User'}</p>
+										<p className="text-xs text-gray-500">{user.phone}</p>
+									</div>
+									<button
+										onClick={handleLogout}
+										className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2"
+									>
+										<LogOut className="h-4 w-4" />
+										Logout
+									</button>
+								</div>
+							)}
+						</div>
 					) : (
 						<Link to="/login" className="inline-flex items-center justify-center rounded-lg bg-green-700 text-white shadow-md px-4 py-2 sm:px-3 sm:py-1 md:px-4 md:py-2 hover:bg-green-800 transition text-sm">{t('login')}</Link>
 					)}
@@ -87,9 +138,22 @@ function Navbar() {
 						</button>
 
 						{user ? (
-							<button className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-green-700 text-white shadow-md hover:bg-green-800 transition" title={user.name || user.phone} aria-label="Profile">
-								<span className="text-xl">👤</span>
-							</button>
+							<div className="flex flex-col gap-2">
+								<div className="px-4 py-2 bg-gray-50 rounded-lg">
+									<p className="text-sm font-medium text-gray-900">{user.name || 'User'}</p>
+									<p className="text-xs text-gray-500">{user.phone}</p>
+								</div>
+								<button
+									onClick={() => {
+										handleLogout()
+										setOpen(false)
+									}}
+									className="inline-flex items-center justify-center gap-2 rounded-lg bg-red-600 text-white shadow-md px-4 py-2 hover:bg-red-700 transition"
+								>
+									<LogOut className="h-4 w-4" />
+									Logout
+								</button>
+							</div>
 						) : (
 							<Link to="/login" onClick={() => setOpen(false)} className="inline-flex items-center justify-center rounded-lg bg-green-700 text-white shadow-md px-4 py-2 hover:bg-green-800 transition text-center">{t('login')}</Link>
 						)}
