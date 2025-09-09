@@ -1,8 +1,11 @@
 import Navbar from '../components/Navbar.jsx'
 import Footer from '../components/Footer.jsx'
+import LocationRangeSetup from '../components/LocationRangeSetup.jsx'
 import { useEffect, useMemo, useState } from 'react'
 import { api } from '../utils/api.js'
 import { useLocation } from '../contexts/LocationContext'
+import { useLocationRange } from '../contexts/LocationRangeContext'
+import { useLanguage } from '../contexts/LanguageContext'
 import { filterByLocation, addDistanceToItems, sortByDistance, formatDistance } from '../utils/locationUtils.js'
 import { MapPin, Settings, Plus } from 'lucide-react'
 import AddEquipmentModal from '../components/AddEquipmentModal.jsx'
@@ -34,6 +37,8 @@ function TypeIcon({ type }) {
 }
 
 function EquipmentCard({ item, onRequest }) {
+	const { t } = useLanguage()
+	
 	return (
 		<div className="bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition">
 			{item.imageUrl ? (
@@ -49,17 +54,17 @@ function EquipmentCard({ item, onRequest }) {
 				<p className="text-sm text-neutral-600">{item.location}</p>
 				{item.distance !== null && (
 					<p className="text-xs text-green-600 font-medium">
-						{formatDistance(item.distance)} away
+						{formatDistance(item.distance)} {t('equipmentRental.away')}
 					</p>
 				)}
 			</div>
 			<div className="mt-3 space-y-1">
 				{item.rentPerDay != null && (
-					<div className="text-sm"><span className="font-medium">Rent:</span> ₹ {item.rentPerDay} / day</div>
+					<div className="text-sm"><span className="font-medium">{t('equipmentRental.rent')}</span> ₹ {item.rentPerDay} / {t('equipmentRental.perDay')}</div>
 				)}
-				<div className="text-sm"><span className="font-medium">Barter:</span> {item.barter ? 'Available (produce/services)' : 'Not available'}</div>
+				<div className="text-sm"><span className="font-medium">{t('equipmentRental.barter')}</span> {item.barter ? t('equipmentRental.barterAvailable') : t('equipmentRental.barterNotAvailable')}</div>
 			</div>
-			<button onClick={() => onRequest(item)} className="mt-4 bg-green-700 text-white px-4 py-2 rounded-lg shadow-md hover:bg-green-800">Request Rental</button>
+			<button onClick={() => onRequest(item)} className="mt-4 bg-green-700 text-white px-4 py-2 rounded-lg shadow-md hover:bg-green-800">{t('equipmentRental.requestRental')}</button>
 		</div>
 	)
 }
@@ -75,7 +80,10 @@ function EquipmentRentalPage() {
 	const [description, setDescription] = useState('')
 	const [contact, setContact] = useState('')
 	const [showAddModal, setShowAddModal] = useState(false)
+	const [showLocationSetup, setShowLocationSetup] = useState(false)
 	const { location, radius, isLocationSet } = useLocation()
+	const { buyerLocation, isWithinDeliveryRange, getCoordinatesFromLocation } = useLocationRange()
+	const { t } = useLanguage()
 	
 	const filtered = useMemo(() => {
 		let data = Array.isArray(items) ? items : []
@@ -85,8 +93,26 @@ function EquipmentRentalPage() {
 			data = data.filter(e => !!e.barter)
 		}
 		
-		// Filter by location if set
-		if (isLocationSet && location) {
+		// Filter by location using LocationRangeContext if buyer location is set
+		if (buyerLocation.isSet && buyerLocation.latitude && buyerLocation.longitude) {
+			// Add mock location data to equipment for demo
+			const itemsWithLocation = data.map(item => ({
+				...item,
+				lat: 19.0760 + (Math.random() - 0.5) * 0.2, // Mock coordinates around Mumbai
+				lng: 72.8777 + (Math.random() - 0.5) * 0.2
+			}))
+			
+			const buyerLoc = {
+				lat: buyerLocation.latitude,
+				lng: buyerLocation.longitude
+			}
+			
+			data = filterByLocation(itemsWithLocation, buyerLoc, buyerLocation.searchRadius)
+			data = addDistanceToItems(data, buyerLoc)
+			data = sortByDistance(data)
+		}
+		// Fallback to old LocationContext if new one isn't set
+		else if (isLocationSet && location) {
 			// Add mock location data to equipment for demo
 			const itemsWithLocation = data.map(item => ({
 				...item,
@@ -100,7 +126,7 @@ function EquipmentRentalPage() {
 		}
 		
 		return data
-	}, [items, onlyBarter, location, radius, isLocationSet])
+	}, [items, onlyBarter, location, radius, isLocationSet, buyerLocation])
 
 	useEffect(() => {
 		let mounted = true
@@ -141,37 +167,54 @@ function EquipmentRentalPage() {
 			<Navbar />
 			<main className="flex-1">
 				<div className="mx-auto max-w-7xl px-4 py-12">
-					<div className="flex items-center justify-between mb-4">
+					{/* Header */}
+					<div className="flex items-center justify-between mb-6">
 						<div>
-							<h1 className="text-xl font-semibold text-green-800">Equipment Rental</h1>
-							<p className="mt-2 text-neutral-700">Rent farm equipment. Pay with money or barter options.</p>
-						</div>
-						<div className="flex items-center gap-4">
-							{isLocationSet && (
-								<div className="flex items-center gap-2 bg-green-50 px-3 py-2 rounded-lg">
-									<MapPin className="h-4 w-4 text-green-600" />
-									<span className="text-sm text-green-800">
-										{location.address} ({radius}km radius)
-									</span>
+							<h1 className="text-3xl font-bold text-gray-900 mb-2">{t('equipmentRental.title')}</h1>
+							<p className="text-gray-600">{t('equipmentRental.subtitle')}</p>
+							{buyerLocation.isSet && (
+								<div className="flex items-center gap-2 mt-2 text-sm text-blue-700 bg-blue-50 px-3 py-1 rounded-full w-fit">
+									<MapPin className="h-4 w-4" />
+									<span>Searching within {buyerLocation.searchRadius}km of {buyerLocation.city}, {buyerLocation.state}</span>
 								</div>
 							)}
+						</div>
+						<div className="flex items-center gap-4">
+							<button 
+								onClick={() => setShowLocationSetup(!showLocationSetup)}
+								className="flex items-center gap-2 bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition"
+							>
+								<Settings className="h-4 w-4" />
+								{buyerLocation.isSet ? 'Update Location' : 'Set Location'}
+							</button>
 							<button
 								onClick={() => setShowAddModal(true)}
 								className="flex items-center gap-2 bg-green-700 text-white px-4 py-2 rounded-lg shadow-md hover:bg-green-800 transition-colors"
 							>
 								<Plus className="h-4 w-4" />
-								<span>Add Equipment</span>
+								<span>{t('equipmentRental.addEquipment')}</span>
 							</button>
 						</div>
 					</div>
+
+					{/* Location Range Setup */}
+					{(!buyerLocation.isSet || showLocationSetup) && (
+						<div className="mb-8">
+							<LocationRangeSetup 
+								isBuyer={true}
+								isOnboarding={!buyerLocation.isSet}
+								onComplete={() => setShowLocationSetup(false)}
+							/>
+						</div>
+					)}
 					
-					{!isLocationSet && (
+					{!buyerLocation.isSet && !isLocationSet && (
 						<div className="mb-4 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
 							<div className="flex items-center gap-2">
 								<Settings className="h-5 w-5 text-yellow-600" />
 								<div>
-									<p className="text-yellow-800 font-medium">Set your location to see nearby equipment</p>
-									<p className="text-yellow-700 text-sm">Go to the <a href="/" className="underline">Home page</a> to set your area radius</p>
+									<p className="text-yellow-800 font-medium">Set your location to find nearby equipment</p>
+									<p className="text-yellow-700 text-sm">Click "Set Location" above to configure your search area and see distance-based results.</p>
 								</div>
 							</div>
 						</div>
@@ -180,14 +223,34 @@ function EquipmentRentalPage() {
 					<div className="mt-4 card-base p-4">
 						<label className="inline-flex items-center gap-2 text-sm">
 							<input type="checkbox" className="h-4 w-4" checked={onlyBarter} onChange={e=>setOnlyBarter(e.target.checked)} />
-							<span>Show only barter-available equipment</span>
+							<span>{t('equipmentRental.showBarterOnly')}</span>
 						</label>
 					</div>
 					<div className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
 						{loading ? (
-							<div className="col-span-full text-center text-neutral-600">Loading...</div>
+							<div className="col-span-full text-center text-neutral-600">{t('common.loading')}</div>
 						) : filtered.length === 0 ? (
-							<div className="col-span-full text-center text-neutral-600">No equipment found</div>
+							<div className="col-span-full text-center py-8">
+								<div className="text-gray-500 mb-4">
+									{buyerLocation.isSet 
+										? "No equipment found within your search radius." 
+										: t('equipmentRental.noEquipmentFound')
+									}
+								</div>
+								{buyerLocation.isSet && (
+									<button 
+										onClick={() => {
+											// Expand search radius by 50km
+											const newRadius = buyerLocation.searchRadius + 50
+											console.log(`Expanding search radius to ${newRadius}km`)
+											// This would call updateBuyerLocation with expanded radius
+										}}
+										className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
+									>
+										Expand search to {buyerLocation.searchRadius + 50}km radius
+									</button>
+								)}
+							</div>
 						) : (
 							filtered.map((it) => (
 								<EquipmentCard key={it.id} item={it} onRequest={request} />
@@ -203,7 +266,7 @@ function EquipmentRentalPage() {
 				<div className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50" role="dialog" aria-modal="true">
 					<div className="bg-white rounded-2xl shadow-xl w-full max-w-lg p-6">
 						<div className="flex items-start justify-between">
-							<h2 className="text-xl font-semibold text-green-800">Request Rental</h2>
+							<h2 className="text-xl font-semibold text-green-800">{t('equipmentRental.requestRental')}</h2>
 							<button className="text-neutral-500" onClick={()=>setActive(null)} aria-label="Close">✕</button>
 						</div>
 						<p className="mt-1 text-sm text-neutral-600">{active.title} — {active.location}</p>
@@ -211,23 +274,23 @@ function EquipmentRentalPage() {
 							<div className="flex items-center gap-4">
 								<label className="inline-flex items-center gap-2">
 									<input type="radio" name="mode" value="money" checked={mode==='money'} onChange={()=>setMode('money')} />
-									<span>Pay with money</span>
+									<span>{t('equipmentRental.payWithMoney')}</span>
 								</label>
-								{active.rentPerDay == null && <span className="text-xs text-neutral-500">(Not available)</span>}
+								{active.rentPerDay == null && <span className="text-xs text-neutral-500">{t('equipmentRental.notAvailable')}</span>}
 							</div>
 							{mode==='money' && active.rentPerDay != null && (
 								<div className="grid grid-cols-2 gap-3">
-									<div className="text-sm text-neutral-700">₹ {active.rentPerDay} per day</div>
-									<input value={days} onChange={e=>setDays(e.target.value)} placeholder="Number of days" inputMode="numeric" className="rounded-lg border border-neutral-200 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500" />
+									<div className="text-sm text-neutral-700">₹ {active.rentPerDay} {t('equipmentRental.perDay')}</div>
+									<input value={days} onChange={e=>setDays(e.target.value)} placeholder={t('equipmentRental.numberOfDays')} inputMode="numeric" className="rounded-lg border border-neutral-200 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500" />
 								</div>
 							)}
 
 							<div className="flex items-center gap-4">
 								<label className="inline-flex items-center gap-2">
 									<input type="radio" name="mode" value="barter" checked={mode==='barter'} onChange={()=>setMode('barter')} />
-									<span>Barter</span>
+									<span>{t('equipmentRental.barterOption')}</span>
 								</label>
-								{!active.barter && <span className="text-xs text-neutral-500">(Not available)</span>}
+								{!active.barter && <span className="text-xs text-neutral-500">{t('equipmentRental.notAvailable')}</span>}
 							</div>
 							{mode==='barter' && active.barter && (
 								<div className="grid grid-cols-1 gap-3">
@@ -236,17 +299,17 @@ function EquipmentRentalPage() {
 										<option value="services">Services</option>
 										<option value="other">Other</option>
 									</select>
-									<textarea value={description} onChange={e=>setDescription(e.target.value)} rows="3" placeholder="Describe what you can offer" className="rounded-lg border border-neutral-200 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500" />
+									<textarea value={description} onChange={e=>setDescription(e.target.value)} rows="3" placeholder={t('equipmentRental.describeOffer')} className="rounded-lg border border-neutral-200 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500" />
 								</div>
 							)}
 
 							<div className="grid grid-cols-1 gap-3">
-								<input value={contact} onChange={e=>setContact(e.target.value)} placeholder="Your phone or email" className="rounded-lg border border-neutral-200 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500" />
+								<input value={contact} onChange={e=>setContact(e.target.value)} placeholder={t('equipmentRental.yourContact')} className="rounded-lg border border-neutral-200 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500" />
 							</div>
 						</div>
 						<div className="mt-6 flex justify-end gap-3">
-							<button className="px-4 py-2 rounded-lg border border-neutral-300" onClick={()=>setActive(null)}>Cancel</button>
-							<button className="bg-green-700 text-white px-4 py-2 rounded-lg shadow-md hover:bg-green-800" onClick={submitRequest}>Send Request</button>
+							<button className="px-4 py-2 rounded-lg border border-neutral-300" onClick={()=>setActive(null)}>{t('common.cancel')}</button>
+							<button className="bg-green-700 text-white px-4 py-2 rounded-lg shadow-md hover:bg-green-800" onClick={submitRequest}>{t('equipmentRental.sendRequest')}</button>
 						</div>
 					</div>
 				</div>

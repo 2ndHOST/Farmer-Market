@@ -20,27 +20,27 @@ function Hero() {
 			<div className="relative mx-auto max-w-7xl px-4 py-16 sm:py-20 md:py-24">
 				<div className="max-w-3xl">
 					<h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-neutral-900">
-						{t('heroTitle')}
+						{t('landing.heroTitle')}
 					</h1>
 					<p className="mt-4 text-lg sm:text-xl text-neutral-700">
-						{t('heroSubtitle')}
+						{t('landing.heroSubtitle')}
 					</p>
 					<div className="mt-8 flex flex-col sm:flex-row gap-4">
 						<a
 							href="/farmer"
 							className="inline-flex items-center justify-center rounded-lg bg-green-700 text-white shadow-md focus:outline-none focus:ring-2 focus:ring-green-600 focus:ring-offset-2 px-6 py-3 sm:px-8 sm:py-3 md:px-10 md:py-4 hover:bg-green-800 transition text-lg md:text-xl"
 						>
-							{t('farmerButton')}
+							{t('landing.farmerButton')}
 						</a>
 						<a href="/buyer" className="inline-flex items-center justify-center rounded-lg bg-green-700 text-white shadow-md px-6 py-3 sm:px-8 sm:py-3 md:px-10 md:py-4 hover:bg-green-800 transition text-lg md:text-xl">
-							{t('buyerButton')}
+							{t('landing.buyerButton')}
 						</a>
-						<a href="/equipment" className="inline-flex items-center justify-center rounded-lg bg-green-700 text-white shadow-md px-6 py-3 sm:px-8 sm:py-3 md:px-10 md:py-4 hover:bg-green-800 transition text-lg md:text-xl">{t('equipmentButton')}</a>
+						<a href="/equipment" className="inline-flex items-center justify-center rounded-lg bg-green-700 text-white shadow-md px-6 py-3 sm:px-8 sm:py-3 md:px-10 md:py-4 hover:bg-green-800 transition text-lg md:text-xl">{t('landing.equipmentButton')}</a>
 					</div>
 
 					<div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-6 text-neutral-700">
-						<p className="card-base p-4 bg-white/80"><span className="font-semibold">{t('farmerDescription').split(':')[0]}:</span> {t('farmerDescription').split(':')[1]}</p>
-						<p className="card-base p-4 bg-white/80"><span className="font-semibold">{t('buyerDescription').split(':')[0]}:</span> {t('buyerDescription').split(':')[1]}</p>
+						<p className="card-base p-4 bg-white/80"><span className="font-semibold">{t('landing.farmerDescription').split(':')[0]}:</span> {t('landing.farmerDescription').split(':')[1]}</p>
+						<p className="card-base p-4 bg-white/80"><span className="font-semibold">{t('landing.buyerDescription').split(':')[0]}:</span> {t('landing.buyerDescription').split(':')[1]}</p>
 					</div>
 				</div>
 
@@ -59,14 +59,14 @@ function Benefits() {
 	
 	return (
 		<section className="mx-auto max-w-7xl px-4 py-12 sm:py-16" aria-labelledby="why">
-			<h2 id="why" className="text-3xl sm:text-4xl font-bold text-neutral-900">{t('whyAgriConnect')}</h2>
+			<h2 id="why" className="text-3xl sm:text-4xl font-bold text-neutral-900">{t('benefits.whyAgriConnect')}</h2>
 			<div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
 				<div className="card-base p-6">
 					<div className="flex items-start gap-4">
 						<div className="text-3xl">👨‍🌾</div>
 						<div>
-							<h3 className="text-xl font-semibold text-neutral-900">{t('forFarmers')}</h3>
-							<p className="mt-1 text-neutral-700">{t('forFarmersDesc')}</p>
+							<h3 className="text-xl font-semibold text-neutral-900">{t('benefits.forFarmers')}</h3>
+							<p className="mt-1 text-neutral-700">{t('benefits.forFarmersDesc')}</p>
 						</div>
 					</div>
 				</div>
@@ -74,8 +74,8 @@ function Benefits() {
 					<div className="flex items-start gap-4">
 						<div className="text-3xl">🛒</div>
 						<div>
-							<h3 className="text-xl font-semibold text-neutral-900">{t('forBuyers')}</h3>
-							<p className="mt-1 text-neutral-700">{t('forBuyersDesc')}</p>
+							<h3 className="text-xl font-semibold text-neutral-900">{t('benefits.forBuyers')}</h3>
+							<p className="mt-1 text-neutral-700">{t('benefits.forBuyersDesc')}</p>
 						</div>
 					</div>
 				</div>
@@ -83,8 +83,8 @@ function Benefits() {
 					<div className="flex items-start gap-4">
 						<Users className="text-green-700" />
 						<div>
-							<h3 className="text-xl font-semibold text-neutral-900">{t('forCommunity')}</h3>
-							<p className="mt-1 text-neutral-700">{t('forCommunityDesc')}</p>
+							<h3 className="text-xl font-semibold text-neutral-900">{t('benefits.forCommunity')}</h3>
+							<p className="mt-1 text-neutral-700">{t('benefits.forCommunityDesc')}</p>
 						</div>
 					</div>
 				</div>
@@ -97,14 +97,14 @@ function HowItWorks() {
 	const { t } = useLanguage()
 	
 	const steps = [
-		{ icon: '📋', title: t('step1'), text: t('step1Desc') },
-		{ icon: '💰', title: t('step2'), text: t('step2Desc') },
-		{ icon: '🤝', title: t('step3'), text: t('step3Desc') },
-		{ icon: '🚜', title: t('step4'), text: t('step4Desc') },
+		{ icon: '📋', title: t('howItWorks.step1'), text: t('howItWorks.step1Desc') },
+		{ icon: '💰', title: t('howItWorks.step2'), text: t('howItWorks.step2Desc') },
+		{ icon: '🤝', title: t('howItWorks.step3'), text: t('howItWorks.step3Desc') },
+		{ icon: '🚜', title: t('howItWorks.step4'), text: t('howItWorks.step4Desc') },
 	]
 	return (
 		<section className="mx-auto max-w-7xl px-4 py-12 sm:py-16" aria-labelledby="how">
-			<h2 id="how" className="text-3xl sm:text-4xl font-bold text-neutral-900">{t('howItWorks')}</h2>
+			<h2 id="how" className="text-3xl sm:text-4xl font-bold text-neutral-900">{t('howItWorks.title')}</h2>
 			<div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
 				{steps.map((s, idx) => (
 					<div key={idx} className="card-base p-6 group hover:-translate-y-0.5 transform transition">

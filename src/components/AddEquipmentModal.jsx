@@ -1,7 +1,9 @@
 import { useState, useRef } from 'react'
 import { X, Upload, Image as ImageIcon } from 'lucide-react'
+import { useLanguage } from '../contexts/LanguageContext'
 
 export default function AddEquipmentModal({ isOpen, onClose, onSubmit }) {
+  const { t } = useLanguage()
   const [formData, setFormData] = useState({
     name: '',
     contact: '',
@@ -54,23 +56,23 @@ export default function AddEquipmentModal({ isOpen, onClose, onSubmit }) {
     const newErrors = {}
     
     if (!formData.name.trim()) {
-      newErrors.name = 'Equipment name is required'
+      newErrors.name = t('addEquipmentModal.equipmentName') + ' ' + t('common.required').toLowerCase()
     }
     
     if (!formData.contact.trim()) {
-      newErrors.contact = 'Contact number is required'
+      newErrors.contact = t('addEquipmentModal.contactNumber') + ' ' + t('common.required').toLowerCase()
     } else if (!/^[\+]?[0-9\s\-\(\)]{10,}$/.test(formData.contact)) {
       newErrors.contact = 'Please enter a valid contact number'
     }
     
     if (!formData.price.trim()) {
-      newErrors.price = 'Rental price is required'
+      newErrors.price = t('addEquipmentModal.rentalPrice') + ' ' + t('common.required').toLowerCase()
     } else if (isNaN(formData.price) || parseFloat(formData.price) <= 0) {
       newErrors.price = 'Please enter a valid price'
     }
     
     if (!formData.location.trim()) {
-      newErrors.location = 'Location is required'
+      newErrors.location = t('addEquipmentModal.addressLocation') + ' ' + t('common.required').toLowerCase()
     }
 
     setErrors(newErrors)
@@ -128,7 +130,7 @@ export default function AddEquipmentModal({ isOpen, onClose, onSubmit }) {
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-xl shadow-lg p-6 max-w-md w-full mx-auto max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-bold text-gray-900">Add Equipment</h2>
+          <h2 className="text-xl font-bold text-gray-900">{t('addEquipmentModal.title')}</h2>
           <button
             onClick={handleClose}
             className="text-gray-400 hover:text-gray-600 transition-colors"
@@ -141,14 +143,14 @@ export default function AddEquipmentModal({ isOpen, onClose, onSubmit }) {
           {/* Equipment Name */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Equipment Name *
+              {t('addEquipmentModal.equipmentName')} *
             </label>
             <input
               type="text"
               name="name"
               value={formData.name}
               onChange={handleInputChange}
-              placeholder="e.g., Tractor, Rotavator, Irrigation Pump"
+              placeholder={t('addEquipmentModal.equipmentNamePlaceholder')}
               className="border rounded-md p-2 w-full focus:outline-none focus:ring-2 focus:ring-green-500"
             />
             {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
@@ -157,14 +159,14 @@ export default function AddEquipmentModal({ isOpen, onClose, onSubmit }) {
           {/* Contact Number */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Contact Number *
+              {t('addEquipmentModal.contactNumber')} *
             </label>
             <input
               type="tel"
               name="contact"
               value={formData.contact}
               onChange={handleInputChange}
-              placeholder="+91 98765 43210"
+              placeholder={t('addEquipmentModal.contactPlaceholder')}
               className="border rounded-md p-2 w-full focus:outline-none focus:ring-2 focus:ring-green-500"
             />
             {errors.contact && <p className="text-red-500 text-xs mt-1">{errors.contact}</p>}
@@ -173,7 +175,7 @@ export default function AddEquipmentModal({ isOpen, onClose, onSubmit }) {
           {/* Rental Price */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Rental Price (per day) *
+              {t('addEquipmentModal.rentalPrice')} *
             </label>
             <div className="relative">
               <span className="absolute left-3 top-2 text-gray-500">₹</span>
@@ -182,7 +184,7 @@ export default function AddEquipmentModal({ isOpen, onClose, onSubmit }) {
                 name="price"
                 value={formData.price}
                 onChange={handleInputChange}
-                placeholder="1500"
+                placeholder={t('addEquipmentModal.pricePlaceholder')}
                 min="0"
                 step="0.01"
                 className="border rounded-md p-2 w-full pl-8 focus:outline-none focus:ring-2 focus:ring-green-500"
@@ -194,14 +196,14 @@ export default function AddEquipmentModal({ isOpen, onClose, onSubmit }) {
           {/* Location */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Address/Location *
+              {t('addEquipmentModal.addressLocation')} *
             </label>
             <input
               type="text"
               name="location"
               value={formData.location}
               onChange={handleInputChange}
-              placeholder="City, State"
+              placeholder={t('addEquipmentModal.locationPlaceholder')}
               className="border rounded-md p-2 w-full focus:outline-none focus:ring-2 focus:ring-green-500"
             />
             {errors.location && <p className="text-red-500 text-xs mt-1">{errors.location}</p>}
@@ -218,14 +220,14 @@ export default function AddEquipmentModal({ isOpen, onClose, onSubmit }) {
               className="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded"
             />
             <label htmlFor="barter" className="text-sm font-medium text-gray-700">
-              Barter available (produce/services)
+              {t('addEquipmentModal.barterAvailable')}
             </label>
           </div>
 
           {/* Photo Upload */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Equipment Photo
+              {t('addEquipmentModal.equipmentPhoto')}
             </label>
             
             {imagePreview ? (
@@ -249,8 +251,8 @@ export default function AddEquipmentModal({ isOpen, onClose, onSubmit }) {
                 className="border-2 border-dashed border-gray-300 rounded-md p-6 text-center cursor-pointer hover:border-green-500 transition-colors"
               >
                 <Upload className="h-8 w-8 text-gray-400 mx-auto mb-2" />
-                <p className="text-sm text-gray-600">Click to upload photo</p>
-                <p className="text-xs text-gray-400">PNG, JPG up to 5MB</p>
+                <p className="text-sm text-gray-600">{t('addEquipmentModal.clickToUpload')}</p>
+                <p className="text-xs text-gray-400">{t('addEquipmentModal.fileFormat')}</p>
               </div>
             )}
             
@@ -271,13 +273,13 @@ export default function AddEquipmentModal({ isOpen, onClose, onSubmit }) {
               onClick={handleClose}
               className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
             >
-              Cancel
+              {t('addEquipmentModal.cancel')}
             </button>
             <button
               type="submit"
               className="flex-1 bg-green-700 text-white px-4 py-2 rounded-lg hover:bg-green-800 transition-colors"
             >
-              Add Equipment
+              {t('addEquipmentModal.addEquipmentButton')}
             </button>
           </div>
         </form>
