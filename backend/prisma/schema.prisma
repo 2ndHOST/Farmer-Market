@@ -31,22 +31,14 @@ model Bid {
 
 
 model User {
-	id         String   @id @default(cuid())
-	phone      String   @unique
-	name       String?
-	role       String   @default("buyer")
-	createdAt  DateTime @default(now())
+	id          String   @id @default(cuid())
+	phone       String   @unique
+	name        String?
+	email       String?
+	role        String   @default("buyer")
+	firebaseUid String?  @unique
+	createdAt   DateTime @default(now())
 }
 
-model OtpCode {
-	id         String   @id @default(cuid())
-	phone      String
-	code       String
-	expiresAt  DateTime
-	consumedAt DateTime?
-	createdAt  DateTime @default(now())
-
-	@@index([phone, createdAt])
-}
 
 

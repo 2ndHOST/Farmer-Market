@@ -228,6 +228,20 @@ export const AuthAPI = {
 		}
 		return { data: await res.json() }
 	},
+	async firebaseAuth({ firebaseUid, phone, name, email }) {
+		const BASE_URL = getApiBaseUrl()
+		const res = await fetch(`${BASE_URL}/auth/firebase-auth`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ firebaseUid, phone, name, email }),
+		})
+		if (!res.ok) {
+			let err
+			try { err = await res.json() } catch { err = null }
+			throw { response: { data: err || { error: 'Failed to authenticate with Firebase' } } }
+		}
+		return { data: await res.json() }
+	},
 }
 
 
