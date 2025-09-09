@@ -104,16 +104,16 @@ export default function AreaSelector() {
     <div className="bg-green-50 rounded-xl shadow-md p-6 mb-8">
       <div className="flex items-center gap-2 mb-4">
         <MapPin className="h-6 w-6 text-green-600" />
-        <h2 className="text-2xl font-bold text-gray-900">{t('setYourArea')}</h2>
+        <h2 className="text-2xl font-bold text-gray-900">{t('areaSelector.setYourArea')}</h2>
       </div>
       
       <p className="text-gray-600 mb-6">
-        {t('areaSubtitle')}
+        {t('areaSelector.areaSubtitle')}
       </p>
 
       {/* Location Section */}
       <div className="mb-6">
-        <h3 className="text-lg font-semibold text-gray-800 mb-3">{t('location')}</h3>
+        <h3 className="text-lg font-semibold text-gray-800 mb-3">{t('areaSelector.location')}</h3>
         
         {!isLocationSet ? (
           <div className="space-y-4">
@@ -127,15 +127,15 @@ export default function AreaSelector() {
               ) : (
                 <Navigation className="h-4 w-4" />
               )}
-              {isLoading ? t('detectingLocation') : t('autoDetectLocation')}
+              {isLoading ? t('areaSelector.detectingLocation') : t('areaSelector.autoDetectLocation')}
             </button>
             
-            <div className="text-center text-gray-500">{t('or')}</div>
+            <div className="text-center text-gray-500">{t('areaSelector.or')}</div>
             
             <div className="flex gap-2">
               <input
                 type="text"
-                placeholder={t('manualLocationPlaceholder')}
+                placeholder={t('areaSelector.manualLocationPlaceholder')}
                 value={manualLocation}
                 onChange={(e) => setManualLocation(e.target.value)}
                 className="flex-1 rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
@@ -144,7 +144,7 @@ export default function AreaSelector() {
                 onClick={handleManualLocation}
                 className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
               >
-                {t('setLocation')}
+                {t('areaSelector.setLocation')}
               </button>
             </div>
           </div>
@@ -166,7 +166,7 @@ export default function AreaSelector() {
               }}
               className="text-red-600 hover:text-red-800 text-sm font-medium"
             >
-              Change
+              {t('areaSelector.change')}
             </button>
           </div>
         )}
@@ -175,7 +175,7 @@ export default function AreaSelector() {
       {/* Radius Section */}
       <div className="mb-6">
         <h3 className="text-lg font-semibold text-gray-800 mb-3">
-          Search Radius: {radius} km
+          {t('areaSelector.searchRadius')}: {radius} km
         </h3>
         
         <div className="space-y-3">
@@ -216,15 +216,15 @@ export default function AreaSelector() {
       {/* Current Status */}
       {isLocationSet && (
         <div className="bg-white rounded-lg p-4 border border-green-200">
-          <h4 className="font-medium text-gray-900 mb-2">Current Settings</h4>
+          <h4 className="font-medium text-gray-900 mb-2">{t('areaSelector.currentSettings')}</h4>
           <p className="text-sm text-gray-600">
-            <strong>Location:</strong> {location.address}
+            <strong>{t('areaSelector.locationLabel')}</strong> {location.address}
           </p>
           <p className="text-sm text-gray-600">
-            <strong>Radius:</strong> {radius} km
+            <strong>{t('areaSelector.radiusLabel')}</strong> {radius} km
           </p>
           <p className="text-xs text-green-600 mt-2">
-            ✓ This area will be used to filter listings across all pages
+            {t('areaSelector.areaFilterNote')}
           </p>
         </div>
       )}
