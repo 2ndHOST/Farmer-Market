@@ -11,8 +11,9 @@ function Login() {
 	const [step, setStep] = useState(1) // 1: mobile input, 2: otp input
 	const [loading, setLoading] = useState(false)
 	const [error, setError] = useState('')
+	const [devMode, setDevMode] = useState(false)
 	const navigate = useNavigate()
-	const { requestOtp, verifyOtp } = useAuth()
+	const { requestOtp, verifyOtp, loading: authLoading } = useAuth()
 
 	function isE164(num) {
 		return /^\+\d{10,15}$/.test(num)
@@ -32,10 +33,14 @@ function Login() {
 		}
 		try {
 			setLoading(true)
-			await requestOtp(mobileNumber.trim())
+			const result = await requestOtp(mobileNumber.trim())
 			setStep(2)
+			// Check if we're in development mode
+			if (result && result.devMode) {
+				setDevMode(true)
+			}
 		} catch (err) {
-			const msg = err?.response?.data?.error || 'Failed to send OTP. Please check the number and try again.'
+			const msg = err?.response?.data?.error || err.message || 'Failed to send OTP. Please check the number and try again.'
 			setError(msg)
 		} finally {
 			setLoading(false)
@@ -69,6 +74,8 @@ function Login() {
 					<h1 className="text-3xl font-bold text-gray-900">Login</h1>
 					<p className="text-gray-600 text-sm mb-4">Enter your name and mobile number to receive an OTP.</p>
 					<form className="mt-6 space-y-4 bg-white p-8 rounded-2xl shadow-xl border border-gray-100" onSubmit={handleSubmit}>
+						{/* reCAPTCHA container - required for Firebase Auth */}
+						<div id="recaptcha-container"></div>
 						<input
 							type="text"
 							placeholder="Your name"
@@ -101,14 +108,23 @@ function Login() {
 						)}
 
 						{error && <p className="text-red-600 text-sm">{error}</p>}
+						
+						{devMode && step === 2 && (
+							<div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-4">
+								<p className="text-yellow-800 text-sm">
+									<strong>Development Mode:</strong> Firebase billing not enabled. 
+									Use OTP: <code className="bg-yellow-100 px-1 rounded">123456</code> or <code className="bg-yellow-100 px-1 rounded">000000</code>
+								</p>
+							</div>
+						)}
 
 						{step === 1 ? (
-							<button type="button" onClick={handleNext} className="w-full bg-green-600 text-white font-semibold py-2 px-4 rounded-xl hover:bg-green-700 transition-all" disabled={!mobileNumber.trim() || !name.trim() || loading}>
-								Next
+							<button type="button" onClick={handleNext} className="w-full bg-green-600 text-white font-semibold py-2 px-4 rounded-xl hover:bg-green-700 transition-all" disabled={!mobileNumber.trim() || !name.trim() || loading || authLoading}>
+								{loading || authLoading ? 'Sending OTP...' : 'Next'}
 							</button>
 						) : (
-							<button type="submit" className="w-full bg-green-600 text-white font-semibold py-2 px-4 rounded-xl hover:bg-green-700 transition-all" disabled={!otp.trim() || loading}>
-								Sign In
+							<button type="submit" className="w-full bg-green-600 text-white font-semibold py-2 px-4 rounded-xl hover:bg-green-700 transition-all" disabled={!otp.trim() || loading || authLoading}>
+								{loading || authLoading ? 'Verifying...' : 'Sign In'}
 							</button>
 						)}
 					</form>
